@@ -1,0 +1,52 @@
+doctype html
+html
+  head
+    title Hypermedia Directory
+    link(rel='stylesheet', href='/stylesheets/collection.css')
+  body
+    header
+      h1
+        | Hypermedia Directory, #{version}
+      h4
+        a(href=collection.href)= collection.href
+    .container
+      - if(typeof(collection.items) !== 'undefined') {
+        .items
+          h2 API Items in the Collection
+          - for (var i = 0; i < collection.items.length; ++i) {
+            .item
+              - for (var j = 0; j < collection.items[i].data.length; ++j){ 
+                div(class=collection.items[i].data[j].name) #{collection.items[i].data[j].value}
+              - }
+          - }
+      - }
+      - if(typeof(collection.links) !== 'undefined') {      
+        .links
+          h2 Collection Links
+          - for (var i = 0; i < collection.links.length; ++i) {
+            li
+              a(href=decodeURIComponent(collection.links[i].href), rel=collection.links[i].rel)= collection.links[i].prompt
+          - }
+      - }
+      - if(typeof(collection.queries) !== 'undefined') {
+        .queries
+          h2 Search the collection of APIs
+          form(name='input', action=collection.href, method='get')
+            label(for=collection.queries[0].data[0].name) Tag
+            input(type='text', name=collection.queries[0].data[0].name)
+            input(type='submit')
+      - }
+      - if(typeof(collection.template) !== 'undefined') {
+        .template
+          form(name='template', action=collection.href, method='post')
+            h2 Submit a new API!
+            - for (var i = 0; i < collection.template.data.length; ++i) {
+              p
+                label(for=collection.template.data[i].name) #{collection.template.data[i].prompt}
+                input(type='text', name=collection.template.data[i].name, )
+            - }
+            input(type='submit')
+      - }
+    footer
+      p Dave Goldberg - Copyright 2013
+      

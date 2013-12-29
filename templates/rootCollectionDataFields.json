@@ -1,0 +1,9 @@
+[
+  {"name" : "apiUrl", "value" : "", "prompt" : "URL of API" },
+  {"name" : "mediaType", "value" : "", "prompt" : "Media Type" },
+  {"name" : "apiName", "value" : "", "prompt" : "API Name" },
+  {"name" : "description", "value" : "", "prompt" : "Description" },
+  {"name" : "tags", "value" : "", "prompt" : "Tags, comma separated" },
+  {"name" : "profiles", "value" : "", "prompt" : "Profiles for Applicaton Semantics" },
+  {"name" : "contact", "value" : "", "prompt": "Contact email address" }
+]

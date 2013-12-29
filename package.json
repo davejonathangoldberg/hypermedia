@@ -1,0 +1,12 @@
+{
+  "name": "HypermediaAPIs",
+  "description": "Hypermedia APIs",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "3.4.6",
+    "mongodb": "*",
+    "jade": "~1.0.1",
+    "validator": "~2.0.0"
+  }
+}
