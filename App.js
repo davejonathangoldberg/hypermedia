@@ -3,7 +3,7 @@ module.exports = function App() {
   var express = require('express');
   var fs = require('fs');
   var app = express();
-  var port = 2199;
+  var port = process.env.PORT || 2199;
   
   app.version = "1.0";
   app.port = port;
@@ -28,7 +28,7 @@ module.exports = function App() {
     res.set('Content-Type', app.mediaType);
     res.json(400, errorTemplate );
   });
-  app.listen();
+  app.listen(port);
   console.log('Listening on port ' + port);
   return app;
 };
