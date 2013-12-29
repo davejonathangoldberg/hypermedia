@@ -7,6 +7,7 @@
     "express": "3.4.6",
     "mongodb": "*",
     "jade": "~1.0.1",
-    "validator": "~2.0.0"
+    "validator": "~2.0.0",
+    "mongoskin": "~0.6.1"
   }
 }
