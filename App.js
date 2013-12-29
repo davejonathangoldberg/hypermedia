@@ -28,7 +28,7 @@ module.exports = function App() {
     res.set('Content-Type', app.mediaType);
     res.json(400, errorTemplate );
   });
-  app.listen(port);
+  app.listen();
   console.log('Listening on port ' + port);
   return app;
 };
