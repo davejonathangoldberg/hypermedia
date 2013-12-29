@@ -536,3 +536,4 @@
 127.0.0.1 - - [Sun, 29 Dec 2013 18:42:09 GMT] "GET /favicon.ico HTTP/1.1" 400 191 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"
 127.0.0.1 - - [Sun, 29 Dec 2013 18:42:25 GMT] "GET / HTTP/1.1" 200 2956 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"
 127.0.0.1 - - [Sun, 29 Dec 2013 18:42:25 GMT] "GET /favicon.ico HTTP/1.1" 404 135 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"
+127.0.0.1 - - [Sun, 29 Dec 2013 19:22:18 GMT] "GET / HTTP/1.1" 304 - "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"

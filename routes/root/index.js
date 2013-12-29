@@ -6,11 +6,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
   // SPECIFY COLLECTION FOR TEMPLATE FORMATTING
   var collection = 'root';
   
-  // PRIVATE FUNCTIONS
-  var addToLinkArray = function(linkObject, linkArray){
-    
-  }
-  
+  // PRIVATE FUNCTIONS  
   var constructLinkObject = function(linkArray, href, rel, prompt, limit, offset){
     href = href || '';
     rel = rel || '';
@@ -132,7 +128,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       links.value = constructLinkObject(links.value, href.value, 'profile', 'Profile');
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
-      var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template, limit, offset);
+      var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
       
       if ((req.accepts(['html', 'json', app.mediaType]) == 'html')) {
         res.set('Content-Type', 'text/html');
@@ -174,13 +170,10 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     rootApiItemArray.push(rootApiItemFields);
     var rootCollectionItem = templates.collectionItemsArrayFromDb(rootApiItemArray, collection, app.basepath); 
       
-    // ADD LINKS TO LINKS ARRAY
-    links.value = constructLinkObject(links.value, href.value, 'next', 'Next ' + limit + ' Results', limit, offset);
-    links.value = constructLinkObject(links.value, href.value, 'prev', 'Previous ' + limit + ' Results', limit, offset);
-    links.value = constructLinkObject(links.value, href.value, 'profile', 'Profile');
+    // ADD LINKS TO LINKS ARRAY - IF ANY
     
     items.value = rootCollectionItem;
-    var rootCollectionItemWrapper = templates.collectionObject(collection, version, href, links, items, queries, template, 'item', 'item'); 
+    var rootCollectionItemWrapper = templates.collectionObject(collection, version, href, links, items, queries, template); 
     
     // INSERT VALID POST DATA AND SEND RESPONSE TO CLIENT
     rootCollection.insert(rootApiItemFields, {safe: true}, function(e, results){
@@ -221,12 +214,9 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     var rootCollectionItem = templates.collectionItemsArrayFromDb(rootApiItemArray, collection, app.basepath);
       
     // ADD LINKS TO LINKS ARRAY
-    links.value = constructLinkObject(links.value, href.value, 'next', 'Next ' + limit + ' Results', limit, offset);
-    links.value = constructLinkObject(links.value, href.value, 'prev', 'Previous ' + limit + ' Results', limit, offset);
-    links.value = constructLinkObject(links.value, href.value, 'profile', 'Profile');
     
     items.value = rootCollectionItem;
-    var rootCollectionItemWrapper = templates.collectionObject(collection, version, href, links, items, queries, template, 'item', 'item'); 
+    var rootCollectionItemWrapper = templates.collectionObject(collection, version, href, links, items, queries, template); 
     
     rootCollection.update({_id: req.params.id}, {$set:rootApiItemFields}, {upsert: true, safe:true, multi:false}, function(e, result){
       if (e) return next();

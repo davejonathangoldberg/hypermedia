@@ -31,7 +31,7 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
       var formattedItems = templates.collectionItemsArrayFromDb(results, collection, app.basepath);
       items.value = formattedItems;
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
-      var collectionObject = templates.collectionObject(collection, version, href, links, items, queries, template, limit, offset);
+      var collectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
       
       if ((req.accepts(['html', 'json', app.mediaType]) == 'html')) {
         res.set('Content-Type', 'text/html');
@@ -63,7 +63,7 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
       var formattedItems = templates.collectionItemsArrayFromDb(results[0].interfaceFields.tags, itemCollection, app.basepath);
       items.value = formattedItems;
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
-      var collectionObject = templates.collectionObject(itemCollection, version, href, links, items, queries, template, limit, offset);
+      var collectionObject = templates.collectionObject(itemCollection, version, href, links, items, queries, template);
       
       if ((req.accepts(['html', 'json', app.mediaType]) == 'html')) {
         res.set('Content-Type', 'text/html');
