@@ -3,10 +3,11 @@ module.exports = function App() {
   var express = require('express');
   var fs = require('fs');
   var app = express();
-  var port = process.env.PORT || 2199;
+  var localPort = 5000;
+  var port = process.env.PORT || localPort;
   
   app.version = "1.0";
-  app.port = port;
+  app.port = (port == localPort) ? (":" + port) : ("");
   app.host = "api.ritc.io";
   app.basepath = '/';
   app.mediaType = 'application/vnd.collection+json';
@@ -30,5 +31,7 @@ module.exports = function App() {
   });
   app.listen(port);
   console.log('Listening on port ' + port);
+  console.log('port: ' + port);
+  console.log('app.port: ' + app.port);
   return app;
 };

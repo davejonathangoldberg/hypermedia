@@ -7,7 +7,7 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
   var collection = 'tags';
   
   this.getCollection = function(req, res, next) {
-    var baseHref = req.protocol + "://" + req.host + ":" + app.port + app.basepath;
+    var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var limit = req.query.limit || 5;
     var offset = req.query.offset || 0;
@@ -55,7 +55,7 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
 
   this.getTagsForOneApi = function(req, res, next) {
     var encodedId = encodeURIComponent(req.params.id);
-    var baseHref = req.protocol + "://" + req.host + ":" + app.port + app.basepath;
+    var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
     var itemCollection = "itemTags";
     var version = { "include" : true, "value" : "1.0" };
     var href = { "include" : true, "value" : baseHref + encodedId + '/tags' };
