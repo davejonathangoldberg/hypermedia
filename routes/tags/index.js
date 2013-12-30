@@ -7,12 +7,13 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
   var collection = 'tags';
   
   this.getCollection = function(req, res, next) {
+    var baseHref = req.protocol + "://" + req.host + ":" + app.port + app.basepath;
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var limit = req.query.limit || 5;
     var offset = req.query.offset || 0;
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : req.protocol + "://" + req.host + ":" + app.port + app.basepath };
-    var links = { "include" : false, "value" : [] };
+    var href = { "include" : true, "value" : baseHref + 'tags' };
+    var links = { "include" : true, "value" : [] };
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : true, "value" : [] };
     var template = { "include" : false };
@@ -30,6 +31,9 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
       // FORMAT RESULT ARRAY FOR PRESENTATION
       var formattedItems = templates.collectionItemsArrayFromDb(results, collection, app.basepath);
       items.value = formattedItems;
+      
+      // ADD LINKS TO LINKS ARRAY
+      links.value = templates.constructLinkObject(links.value, baseHref, 'api_list', 'All APIs');
       
       // ADD QUERIES TO QUERIES ARRAY
       queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);

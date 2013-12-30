@@ -9,7 +9,7 @@ html
         a(href=collection.href) Hypermedia Directory
     .container
       - if(typeof(collection.items) !== 'undefined') {
-        .items
+        .collection
           h2 Items in the Collection
           - for (var i = 0; i < collection.items.length; ++i) {
             .item
@@ -58,6 +58,19 @@ html
                 input(type='text', name=collection.template.data[i].name, )
             - }
             input(type='submit')
+      - }
+      - if(typeof(collection.error) !== 'undefined') {
+        .error
+          - if(typeof(collection.error.title) !== 'undefined') {
+            h2 Title: #{collection.error.title}
+          - }
+          - if(typeof(collection.error.code) !== 'undefined') {
+            p Code: #{collection.error.code}
+          - }
+          - if(typeof(collection.error.message) !== 'undefined') {
+            p Message: #{collection.error.message}
+          - }
+          
       - }
     footer
       span Ritc - &copy; 2013

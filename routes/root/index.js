@@ -76,7 +76,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     var limit = 'item';
     var offset = 'item';
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : baseHref + encodedId};
+    var href = { "include" : true, "value" : baseHref};
     var links = { "include" : true, "value" : [] };
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : true, "value" : [] };
@@ -125,18 +125,19 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     var operationType = 'POST';
     var version = { "include" : true, "value" : "1.0" };
     var href = { "include" : true, "value" : req.protocol + "://" + req.host + ":" + app.port + app.basepath };
-    var links = { "include" : true, "value" : [] };
+    var links = { "include" : false, "value" : [] };
     var items = { "include" : true, "value" : [] };
-    var queries = { "include" : false, "value" : [] };
+    var queries = { "include" : true, "value" : [] };
     var template = { "include" : true };
     var rootCollectionNameFields = templates.collectionNameFields(collection);
     var rootApiItemFields = validations.validateRootItemFromForm(operationType, rootCollectionNameFields, req.body);
     
     // HANDLE POST ERROR
     if (rootApiItemFields.validationError) {
-      res.set('Content-Type', app.mediaType);
+      res.set('Content-Type', 'text/html');
       errorTemplate.collection.error.message = rootApiItemFields.message;
-      return res.json(400, errorTemplate);
+      res.statusCode = 400;
+      return res.render('rootCollection', errorTemplate);
     }
     
     var rawIdUrl = validations.trimUrl(rootApiItemFields.interfaceFields.apiUrl);
@@ -150,6 +151,9 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       
     // ADD LINKS TO LINKS ARRAY - IF ANY
     
+    // ADD QUERIES TO QUERIES ARRAY
+    queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
+    
     items.value = rootCollectionItem;
     var rootCollectionItemWrapper = templates.collectionObject(collection, version, href, links, items, queries, template); 
     
@@ -159,7 +163,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       res.set('Content-Type', 'text/html');
       res.set('Location', rootApiItemFields.interfaceFields.href);
       res.statusCode = 201;
-      return res.json(rootCollectionItemWrapper);
+      return res.render('rootCollection', rootCollectionItemWrapper);
     });
     
   }
