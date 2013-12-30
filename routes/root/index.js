@@ -6,40 +6,6 @@ module.exports = function RootRoutes(app, database, templates, validations) {
   // SPECIFY COLLECTION FOR TEMPLATE FORMATTING
   var collection = 'root';
   
-  // PRIVATE FUNCTIONS  
-  var constructLinkObject = function(linkArray, href, rel, prompt, limit, offset){
-    href = href || '';
-    rel = rel || '';
-    prompt = prompt || rel;
-    limit = limit || 'na';
-    offset = offset || 'na';
-    var linkObject = {};
-    
-    if (rel == 'next') {
-      if (!(limit == 'na' || offset == 'na')){
-        var newOffset = (parseInt(limit) + parseInt(offset));
-        href = href + '?limit=' + limit + '&offset=' + newOffset;
-      }
-    }
-    if (rel == 'prev') {   
-        var oldOffset = parseInt(offset) - parseInt(limit);
-        
-        if ((offset > 0) && (oldOffset > 0)){
-          href = href + '?limit=' + limit + '&offset=' + oldOffset;
-        }
-        else if ((offset > 0) && (oldOffset <= 0)){
-          href = href + "?limit=" + limit + "&offset=0";
-        }
-        else {
-          console.log('no offset');
-          return linkArray;
-        }
-      }
-
-    linkArray.push({"href" : href, "rel" : rel, "prompt": prompt }); 
-    return linkArray;
-  }
-  
   // PUBLIC FUNCTIONS
   this.getCollection = function(req, res, next){
     var limit = req.query.limit || 5;
@@ -60,9 +26,13 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       items.value = formattedRootItems;
       
       // ADD LINKS TO LINKS ARRAY
-      links.value = constructLinkObject(links.value, href.value, 'next', 'Next ' + limit + ' Results', limit, offset);
-      links.value = constructLinkObject(links.value, href.value, 'prev', 'Previous ' + limit + ' Results', limit, offset);
-      links.value = constructLinkObject(links.value, href.value, 'profile', 'Profile');
+      links.value = templates.constructLinkObject(links.value, href.value, 'next', 'Next ' + limit + ' Results', limit, offset);
+      links.value = templates.constructLinkObject(links.value, href.value, 'prev', 'Previous ' + limit + ' Results', limit, offset);
+      links.value = templates.constructLinkObject(links.value, href.value, 'profile', 'Profile');
+      
+      // ADD QUERIES TO QUERIES ARRAY
+      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
+      queries.value = templates.constructQueryObject(queries.value, 'query_google', 'http://www.google.com', 'Search Google', [{"name" : "#q", "value" : ""}]);
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
@@ -100,14 +70,16 @@ module.exports = function RootRoutes(app, database, templates, validations) {
   }
   
   this.getItem = function(req, res, next) {
+    var encodedId = encodeURIComponent(req.params.id);
+    var baseHref = req.protocol + "://" + req.host + ":" + app.port + app.basepath;
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var limit = 'item';
     var offset = 'item';
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : req.protocol + "://" + req.host + ":" + app.port + app.basepath };
+    var href = { "include" : true, "value" : baseHref + encodedId};
     var links = { "include" : true, "value" : [] };
     var items = { "include" : true, "value" : [] };
-    var queries = { "include" : false, "value" : [] };
+    var queries = { "include" : true, "value" : [] };
     var template = { "include" : false };
     
     rootCollection.find({ '_id' : req.params.id }, {limit:10, sort: [['modifiedDate',-1]], }).toArray(function(e, results){
@@ -123,13 +95,16 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       items.value = formattedRootItems;
       
       // ADD LINKS TO LINKS ARRAY
-      links.value = constructLinkObject(links.value, href.value, 'next', 'Next ' + limit + ' Results', limit, offset);
-      links.value = constructLinkObject(links.value, href.value, 'prev', 'Previous ' + limit + ' Results', limit, offset);
-      links.value = constructLinkObject(links.value, href.value, 'profile', 'Profile');
+      links.value = templates.constructLinkObject(links.value, baseHref, 'api_list', 'All APIs');
+      links.value = templates.constructLinkObject(links.value, items.value[0].href + '/tags', 'tags', 'Tags');
+      links.value = templates.constructLinkObject(links.value, href.value, 'profile', 'Profile');
+      
+      // ADD QUERIES TO QUERIES ARRAY
+      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
-      
+      console.log(JSON.stringify(rootCollectionObject.collection.links));
       if ((req.accepts(['html', 'json', app.mediaType]) == 'html')) {
         res.set('Content-Type', 'text/html');
         res.statusCode = 200;
@@ -142,7 +117,57 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     });
   }
 
+  this.createNewApiRecordFromFormPost = function(req, res, next) {
+    if (!(req.is('application/x-www-form-urlencoded') || req.is('multipart/form-data'))) {
+      return next();
+    }
+    var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
+    var operationType = 'POST';
+    var version = { "include" : true, "value" : "1.0" };
+    var href = { "include" : true, "value" : req.protocol + "://" + req.host + ":" + app.port + app.basepath };
+    var links = { "include" : true, "value" : [] };
+    var items = { "include" : true, "value" : [] };
+    var queries = { "include" : false, "value" : [] };
+    var template = { "include" : true };
+    var rootCollectionNameFields = templates.collectionNameFields(collection);
+    var rootApiItemFields = validations.validateRootItemFromForm(operationType, rootCollectionNameFields, req.body);
+    
+    // HANDLE POST ERROR
+    if (rootApiItemFields.validationError) {
+      res.set('Content-Type', app.mediaType);
+      errorTemplate.collection.error.message = rootApiItemFields.message;
+      return res.json(400, errorTemplate);
+    }
+    
+    var rawIdUrl = validations.trimUrl(rootApiItemFields.interfaceFields.apiUrl);
+    rootApiItemFields._id = rawIdUrl;
+    rootApiItemFields.createdDate = new Date();
+    
+    // FORMAT DATA FOR RETURNING TO CLIENT AFTER SUCCESSFUL POST 
+    var rootApiItemArray = []
+    rootApiItemArray.push(rootApiItemFields);
+    var rootCollectionItem = templates.collectionItemsArrayFromDb(rootApiItemArray, collection, app.basepath); 
+      
+    // ADD LINKS TO LINKS ARRAY - IF ANY
+    
+    items.value = rootCollectionItem;
+    var rootCollectionItemWrapper = templates.collectionObject(collection, version, href, links, items, queries, template); 
+    
+    // INSERT VALID POST DATA AND SEND RESPONSE TO CLIENT
+    rootCollection.insert(rootApiItemFields, {safe: true}, function(e, results){
+      if (e) return next();
+      res.set('Content-Type', 'text/html');
+      res.set('Location', rootApiItemFields.interfaceFields.href);
+      res.statusCode = 201;
+      return res.json(rootCollectionItemWrapper);
+    });
+    
+  }
+  
   this.createNewApiRecord = function(req, res, next) {
+    if (req.is('application/x-www-form-urlencoded') || req.is('multipart/form-data')) {
+      return next();
+    }
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var operationType = 'POST';
     var version = { "include" : true, "value" : "1.0" };

@@ -1,5 +1,48 @@
 module.exports = function Templates() {
   
+  // PRIVATE FUNCTIONS  
+  this.constructLinkObject = function(linkArray, href, rel, prompt, limit, offset){
+    href = href || '';
+    rel = rel || '';
+    prompt = prompt || rel;
+    limit = limit || 'na';
+    offset = offset || 'na';
+    var linkObject = {};
+    
+    if (rel == 'next') {
+      if (!(limit == 'na' || offset == 'na')){
+        var newOffset = (parseInt(limit) + parseInt(offset));
+        href = href + '?limit=' + limit + '&offset=' + newOffset;
+      }
+    }
+    if (rel == 'prev') {   
+        var oldOffset = parseInt(offset) - parseInt(limit);
+        
+        if ((offset > 0) && (oldOffset > 0)){
+          href = href + '?limit=' + limit + '&offset=' + oldOffset;
+        }
+        else if ((offset > 0) && (oldOffset <= 0)){
+          href = href + "?limit=" + limit + "&offset=0";
+        }
+        else {
+          return linkArray;
+        }
+      }
+    linkArray.push({"href" : href, "rel" : rel, "prompt": prompt }); 
+    return linkArray;
+  }
+  
+  this.constructQueryObject = function(queriesArray, rel, href, prompt, data){
+    href = href || '';
+    rel = rel || '';
+    prompt = prompt || rel;
+    data = data || [];
+    var queryObject = {};
+    
+    queriesArray.push({"href" : href, "rel" : rel, "prompt": prompt, "data" : data }); 
+    return queriesArray;
+  }
+  
   this.collectionDataFields = function(collection) {
     switch(collection){
     case "root":
@@ -24,8 +67,8 @@ module.exports = function Templates() {
     if (version.include) collectionTemplate.collection.version = version.value;
     if (href.include) collectionTemplate.collection.href = href.value;
     if (items.include) collectionTemplate.collection.items = items.value;
-    if (links.include) collectionTemplate.collection.links = links.value; 
-    if (queries.include) collectionTemplate.collection.queries = require('./rootCollectionQueriesArray.json'); // NEEDS TO CHANGE TO DYNAMICALLY ASSEMBLE QUERIES
+    if (links.include) collectionTemplate.collection.links = links.value;
+    if (queries.include) collectionTemplate.collection.queries = queries.value; // NEEDS TO CHANGE TO DYNAMICALLY ASSEMBLE QUERIES
     if (template.include) {
       collectionTemplate.collection.template = {};
       collectionTemplate.collection.template.data = this.collectionDataFields(collection);
@@ -79,14 +122,14 @@ module.exports = function Templates() {
       "href" : itemResourceUrl,
       "data" : [
         {"name" : "apiName", "value" : itemFields.interfaceFields.apiName, "prompt" : "API Name" },
-        {"name" : "mediaType", "value" : itemFields.interfaceFields.mediaType, "prompt" : "Media Type" },
+        {"name" : "mediaType", "value" : itemFields.interfaceFields.mediaType, "prompt" : "Media-Type" },
         {"name" : "description", "value" : itemFields.interfaceFields.description, "prompt" : "Description" },
-        {"name" : "tags", "value" : itemFields.interfaceFields.tags.toString(), "prompt" : "Tags, comma separated" },
+        {"name" : "tags", "value" : itemFields.interfaceFields.tags.toString(), "prompt" : "Tags (comma separated)" },
         {"name" : "profiles", "value" : itemFields.interfaceFields.profiles, "prompt" : "Profiles for Applicaton Semantics" },
         {"name" : "contact", "value" : itemFields.interfaceFields.contact, "prompt": "Contact email address" }
       ],
       "links" : [
-        {"rel" : "apiUrl", "href" : itemFields.interfaceFields.apiUrl}
+        {"rel" : "apiUrl", "href" : itemFields.interfaceFields.apiUrl, "prompt" : "URL"}
       ]
     }
   }

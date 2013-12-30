@@ -83,7 +83,7 @@ module.exports = function Validations() {
         }
       }
       
-      if((dataObject.name == 'apiName') && (dataObject.name != '')) {
+      if((dataObject.name == 'apiName') && (dataObject.value != '')) {
         try {
           check(dataObject.value).notNull();
         } catch (e) {
@@ -148,6 +148,119 @@ module.exports = function Validations() {
   
   }
   
+  
+  this.validateRootItemFromForm = function (operationType, rootCollectionNameFields, itemFields) {
+    var rootCollectionNameList = rootCollectionNameFields.toString();
+    
+    // VALIDATE STRUCTURE OF POST BODY
+    var dataFieldNames = [];
+    var itemDataFieldsObject = {};
+    
+    // ITERATE THROUGH DATA OBJECTS
+    for ( var field in itemFields ) {
+    
+      dataFieldNames.push(field);  
+      // DON'T ALLOW FIELDS THAT AREN'T DEFINED IN THE TEMPLATE
+      if (rootCollectionNameFields.indexOf(field) < 0) {
+        return {  "validationError" : true,
+                  "message" : "You tried to submit " + field + ". Attributes of an API are limited to " + rootCollectionNameList + ".",
+                  "interfaceFields" : ""
+               };
+      }
+      
+      // VALIDATE INPUT FIELDS -- USE FOR BOTH INSERT AND UPDATE
+      if( field == 'apiUrl' ) {
+        try {
+          check(itemFields[field]).isUrl();
+        } catch (e) {
+          console.log(e.message); 
+          return {  "validationError" : true,
+                    "message" : "Invalid URL supplied in apiUrl field.",
+                    "interfaceFields" : ""
+                 };
+        }
+      }
+      if( field == 'mediaType' ) {
+        try {
+          check(itemFields[field]).len(5).notEmpty();
+        } catch (e) {
+          console.log(e.message);
+          console.log("Name: " + dataObject.name + " Value: " + dataObject.value);
+          return {  "validationError" : true,
+                    "message" : "MediaType length must be greater than 5 characters.",
+                    "interfaceFields" : ""
+                 };
+        }
+      }
+      
+      if(( field == 'apiName') && ( itemFields[field] != '')) {
+        try {
+          check(itemFields[field]).notNull();
+        } catch (e) {
+          console.log(e.message);
+          console.log("Name: " + field + " Value: " + itemFields[field]);
+          return {  "validationError" : true,
+                    "message" : "Please check your input and re-submit.",
+                    "interfaceFields" : ""
+                 };
+        }
+      }
+      
+      if(( field == 'contact') && ( itemFields[field] != '')) {
+        try {
+          check(itemFields[field]).notNull().isEmail();
+        } catch (e) {
+          console.log(e.message);
+          console.log("Name: " + field + " Value: " + itemFields[field]);
+          return {  "validationError" : true,
+                    "message" : "You submitted an invalid email address.",
+                    "interfaceFields" : ""
+                 };
+        }
+      }
+      
+      if((field == 'tags')) {
+        try {
+        }
+        catch (e) {
+          console.log(e.message);
+          console.log("Name: " + field + " Value: " + itemFields[field]);
+          return {  "validationError" : true,
+                    "message" : "Tags should not be null.",
+                    "interfaceFields" : ""
+                 };
+        }
+        var tagsArray = itemFields[field];
+        tagsArray = tagsArray.split(',');
+        for ( var i=0; i<tagsArray.length; i++ ) {
+          tagsArray[i] = sanitize(tagsArray[i]).trim();
+        }
+        itemFields[field] = [];
+        itemFields[field] = tagsArray;
+      }
+      
+      // MAP TO SINGLE OBJECT
+      itemDataFieldsObject[field] = itemFields[field];
+    }// END ITERATION THROUGH DATA OBJECTS
+    
+    // MAKE SURE THAT REQUIRED FIELDS WERE SUBMITTED -- ONLY FOR INSERT OPERATIONS, NOT UPDATE
+    for ( var i=0; i<rootCollectionNameFields.length; i++ ) {
+      if(dataFieldNames.indexOf(rootCollectionNameFields[i]) < 0) {
+        return {  "validationError" : true,
+                  "message" : "Error - You did not submit all elements of the template data array (" + rootCollectionNameList + "). Please submit again using the complete template.",
+                  "interfaceFields"  : ""
+               };
+      }
+    }
+    
+    // IF VALIDATIONS PASS, SEND BACK DATA FOR INSERTION INTO DB
+    return {  "validationError" : false,
+              "message" : "",
+              "modifiedDate" : new Date(),
+              "interfaceFields" : itemDataFieldsObject
+           };
+  
+  }
   
 }
 

@@ -22,6 +22,7 @@ module.exports = function Routes(app, database, templates, validations) {
   app.get('/raw', rootRoutes.getRawFieldsFromDb); // ROUTE FOR TESTING THINGS OUT
   app.get(app.basepath + ':id', rootRoutes.getItem); // RETRIEVE INDIVIDUAL API
   app.post(app.basepath, rootRoutes.createNewApiRecord); // POST A NEW API
+  app.post(app.basepath, rootRoutes.createNewApiRecordFromFormPost); // POST A NEW API FROM AN HTML FORM
   app.put(app.basepath + ':id', rootRoutes.updateApiRecord); // UPDATE AN INDIVIDUAL API
   app.del(app.basepath + ':id', rootRoutes.deleteApiRecord); // DELETE AN API
   

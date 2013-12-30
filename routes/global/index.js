@@ -17,18 +17,21 @@ module.exports = function GlobalRoutes(app, templates, validations) {
       errorTemplate.collection.error.message = 'Please re-submit request with an Accept header value of application/vnd.collection+json or application/json';
       return res.json(errorTemplate);
     }
-    next();
+    return next();
   }
   
   this.checkContentTypeHeader = function(req, res, next){
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
+    if (req.is('application/x-www-form-urlencoded') || req.is('multipart/form-data')) {
+      return next();
+    }
     if (!(req.is('application/vnd.collection+json') || req.is('json'))) {
       res.set('Content-Type', app.mediaType);
       res.statusCode = 406;
       errorTemplate.collection.error.message = 'Please re-submit request with a Content-Type header value of application/vnd.collection+json or application/json';
       return res.json(errorTemplate);
     }
-    next();
+    return next();
   }
   
   this.checkAuth = function(req, res, next){
@@ -39,7 +42,7 @@ module.exports = function GlobalRoutes(app, templates, validations) {
       errorTemplate.collection.error.message = 'You are not authorized to perform that action.';
       return res.json(errorTemplate);
     }
-    next();
+    return next();
   }
   
   this.catchAll = function(req, res){

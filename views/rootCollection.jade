@@ -6,18 +6,26 @@ html
   body
     header
       h1
-        | Hypermedia Directory, #{version}
-      h4
-        a(href=collection.href)= collection.href
+        a(href=collection.href) Hypermedia Directory
     .container
       - if(typeof(collection.items) !== 'undefined') {
         .items
-          h2 API Items in the Collection
+          h2 Items in the Collection
           - for (var i = 0; i < collection.items.length; ++i) {
             .item
-              - for (var j = 0; j < collection.items[i].data.length; ++j){ 
-                div(class=collection.items[i].data[j].name) #{collection.items[i].data[j].value}
+              .href
+                a(href=collection.items[i].href) #{collection.items[i].href}
+              - if(typeof(collection.items[i].data) !== 'undefined') {
+                - for (var j = 0; j < collection.items[i].data.length; ++j){ 
+                  div(class=collection.items[i].data[j].name) #{collection.items[i].data[j].value}
+                - }
               - }
+              - if(typeof(collection.items[i].links) !== 'undefined') {
+                - for (var k = 0; k < collection.items[i].links.length; ++k){ 
+                  div(class=collection.items[i].links[k].rel)
+                    a(href=collection.items[i].links[k].href, rel=collection.items[i].links[k].rel) #{collection.items[i].links[k].href}
+                - }
+              - } 
           - }
       - }
       - if(typeof(collection.links) !== 'undefined') {      
@@ -25,21 +33,25 @@ html
           h2 Collection Links
           - for (var i = 0; i < collection.links.length; ++i) {
             li
-              a(href=decodeURIComponent(collection.links[i].href), rel=collection.links[i].rel)= collection.links[i].prompt
+              a(href=collection.links[i].href, rel=collection.links[i].rel)= collection.links[i].prompt
           - }
       - }
       - if(typeof(collection.queries) !== 'undefined') {
         .queries
-          h2 Search the collection of APIs
-          form(name='input', action=collection.href, method='get')
-            label(for=collection.queries[0].data[0].name) Tag
-            input(type='text', name=collection.queries[0].data[0].name)
-            input(type='submit')
+          h2 Collection Queries
+          - for (var i = 0; i < collection.queries.length; ++i) {
+            form(name=collection.queries[i].rel, action=collection.queries[i].href, method='get')
+              span(id=collection.queries[i].rel) #{collection.queries[i].prompt}
+              - for (var j = 0; j < collection.queries[i].data.length; ++j) {
+                input(type='text', name=collection.queries[i].data[j].name)
+              - }
+              input(type='submit', value='Search')
+          - }
       - }
       - if(typeof(collection.template) !== 'undefined') {
         .template
           form(name='template', action=collection.href, method='post')
-            h2 Submit a new API!
+            h2 Submit a new Item
             - for (var i = 0; i < collection.template.data.length; ++i) {
               p
                 label(for=collection.template.data[i].name) #{collection.template.data[i].prompt}
@@ -48,5 +60,5 @@ html
             input(type='submit')
       - }
     footer
-      p Dave Goldberg - Copyright 2013
+      span Ritc - &copy; 2013
       
