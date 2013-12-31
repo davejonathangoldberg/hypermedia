@@ -7,6 +7,7 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
   var collection = 'tags';
   
   this.getCollection = function(req, res, next) {
+    
     var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var limit = req.query.limit || 5;
@@ -17,8 +18,17 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : true, "value" : [] };
     var template = { "include" : false };
+    if (req.params.hasOwnProperty('tag')) {
+      var tag = req.params.tag;
+    }
+    else if (req.query.hasOwnProperty('tag')){
+      var tag = req.query.tag;
+    } else {
+      var tag = "";
+    }
     
-    rootCollection.find({ 'interfaceFields.tags' : req.params.tag }, {limit: limit, skip: offset, sort: [['modifiedDate',-1]], }).toArray(function(e, results){
+    
+    rootCollection.find({ 'interfaceFields.tags' : tag }, {limit: limit, skip: offset, sort: [['modifiedDate',-1]], }).toArray(function(e, results){
       if (e) return next(e);
       // SEND 404 IF TAG DOES NOT EXIST
       if(!(results.length > 0)) {
@@ -36,7 +46,7 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
       links.value = templates.constructLinkObject(links.value, baseHref, 'api_list', 'All APIs');
       
       // ADD QUERIES TO QUERIES ARRAY
-      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
+      queries.value = templates.constructQueryObject(queries.value, 'query_tags', baseHref, 'Search By Tag', [{"name" : "tag", "value" : ""}]);
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var collectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
@@ -75,7 +85,7 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
       links.value = templates.constructLinkObject(links.value, app.basepath + encodedId, 'item_view', 'View API');
       console.log('links.value: ' + JSON.stringify(links.value));
       // ADD QUERIES TO QUERIES ARRAY
-      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
+      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tag", "value" : ""}]);
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var collectionObject = templates.collectionObject(itemCollection, version, href, links, items, queries, template);

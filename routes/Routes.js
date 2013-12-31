@@ -27,6 +27,7 @@ module.exports = function Routes(app, database, templates, validations) {
   app.del(app.basepath + ':id', rootRoutes.deleteApiRecord); // DELETE AN API
   
   // TAGS COLLECTION ROUTES
+  app.get(app.basepath, tagsRoutes.getCollection); // RETRIEVE APIS FOR A GIVEN TAG
   app.get(app.basepath + 'tags/:tag', tagsRoutes.getCollection); // RETRIEVE APIS FOR A GIVEN TAG
   app.get(app.basepath + ':id/tags', tagsRoutes.getTagsForOneApi); // RETRIEVE TAGS COLLECTION FOR INDIVIDUAL API
   

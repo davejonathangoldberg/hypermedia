@@ -8,6 +8,9 @@ module.exports = function RootRoutes(app, database, templates, validations) {
   
   // PUBLIC FUNCTIONS
   this.getCollection = function(req, res, next){
+    if (req.query.hasOwnProperty('tag')) {
+      return next();
+    }
     var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
     var limit = req.query.limit || 5;
     var offset = req.query.offset || 0;
@@ -32,8 +35,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       links.value = templates.constructLinkObject(links.value, href.value, 'profile', 'Profile');
       
       // ADD QUERIES TO QUERIES ARRAY
-      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
-      queries.value = templates.constructQueryObject(queries.value, 'query_google', 'http://www.google.com', 'Search Google', [{"name" : "#q", "value" : ""}]);
+      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tag", "value" : ""}]);
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
@@ -101,7 +103,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       links.value = templates.constructLinkObject(links.value, href.value, 'profile', 'Profile');
       
       // ADD QUERIES TO QUERIES ARRAY
-      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
+      queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tag", "value" : ""}]);
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
@@ -153,7 +155,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     // ADD LINKS TO LINKS ARRAY - IF ANY
     
     // ADD QUERIES TO QUERIES ARRAY
-    queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tags", "value" : ""}]);
+    queries.value = templates.constructQueryObject(queries.value, 'query_tags', href.value, 'Search By Tag', [{"name" : "tag", "value" : ""}]);
     
     items.value = rootCollectionItem;
     var rootCollectionItemWrapper = templates.collectionObject(collection, version, href, links, items, queries, template); 
