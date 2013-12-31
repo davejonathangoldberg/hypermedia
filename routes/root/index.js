@@ -11,7 +11,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     if (req.query.hasOwnProperty('tag')) {
       return next();
     }
-    var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
+    var baseHref = app.basepath;
     var limit = req.query.limit || 5;
     var offset = req.query.offset || 0;
     var version = { "include" : true, "value" : "1.0" };
@@ -56,7 +56,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
   
   this.getRawFieldsFromDb = function(req, res, next){
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : req.protocol + "://" + req.host + app.port + app.basepath };
+    var href = { "include" : true, "value" : app.basepath };
     var links = { "include" : true, "value" : [] };
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : false, "value" : [] };
@@ -73,8 +73,11 @@ module.exports = function RootRoutes(app, database, templates, validations) {
   }
   
   this.getItem = function(req, res, next) {
+    if (req.params.id == 'tags') {
+      return next();
+    }
     var encodedId = encodeURIComponent(req.params.id);
-    var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
+    var baseHref = app.basepath;
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var limit = 'item';
     var offset = 'item';
@@ -127,7 +130,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var operationType = 'POST';
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : req.protocol + "://" + req.host + app.port + app.basepath };
+    var href = { "include" : true, "value" : app.basepath };
     var links = { "include" : false, "value" : [] };
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : true, "value" : [] };
@@ -178,7 +181,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var operationType = 'POST';
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : req.protocol + "://" + req.host + app.port + app.basepath };
+    var href = { "include" : true, "value" : app.basepath };
     var links = { "include" : true, "value" : [] };
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : false, "value" : [] };
@@ -222,7 +225,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
     var errorTemplate = templates.errorTemplate("", req.protocol, req.host, app.basepath);
     var operationType = 'PUT';
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : req.protocol + "://" + req.host + app.port + app.basepath };
+    var href = { "include" : true, "value" : app.basepath };
     var links = { "include" : true, "value" : [] };
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : false, "value" : [] };

@@ -6,14 +6,22 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
   // SPECIFY COLLECTION FOR TEMPLATE FORMATTING
   var collection = 'tags';
   
+  this.getTags = function(req, res, next) {
+    var baseHref = app.basepath;
+
+    res.location(baseHref);
+    res.statusCode = 301;
+    return res.send('redirect');
+  }
+  
+  
   this.getCollection = function(req, res, next) {
-    
-    var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
+    var baseHref = app.basepath;
     var errorTemplate = templates.errorTemplate('', req.protocol, req.host, app.basepath);
     var limit = req.query.limit || 5;
     var offset = req.query.offset || 0;
     var version = { "include" : true, "value" : "1.0" };
-    var href = { "include" : true, "value" : baseHref + 'tags' };
+    var href = { "include" : true, "value" : baseHref };
     var links = { "include" : true, "value" : [] };
     var items = { "include" : true, "value" : [] };
     var queries = { "include" : true, "value" : [] };
@@ -31,7 +39,16 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
     rootCollection.find({ 'interfaceFields.tags' : tag }, {limit: limit, skip: offset, sort: [['modifiedDate',-1]], }).toArray(function(e, results){
       if (e) return next(e);
       // SEND 404 IF TAG DOES NOT EXIST
+      
       if(!(results.length > 0)) {
+        
+        if ((req.accepts(['html', 'json', app.mediaType]) == 'html')) {
+          res.set('Content-Type', 'text/html');
+          res.statusCode = 200;
+          errorTemplate.collection.error.message = 'The tag ' + tag + ' could not be found.';
+          return res.render('rootCollection', errorTemplate);
+        }
+        
         res.set('Content-Type', app.mediaType);
         res.statusCode = 404;
         errorTemplate.collection.error.message = 'Tag Not Found';
@@ -64,8 +81,9 @@ module.exports = function TagsRoutes(app, database, templates, validations) {
   }
 
   this.getTagsForOneApi = function(req, res, next) {
+    console.log('tags get tags for one api');
     var encodedId = encodeURIComponent(req.params.id);
-    var baseHref = req.protocol + "://" + req.host + app.port + app.basepath;
+    var baseHref = app.basepath;
     var itemCollection = "itemTags";
     var version = { "include" : true, "value" : "1.0" };
     var href = { "include" : true, "value" : baseHref + encodedId + '/tags' };

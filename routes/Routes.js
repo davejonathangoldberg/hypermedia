@@ -29,6 +29,7 @@ module.exports = function Routes(app, database, templates, validations) {
   // TAGS COLLECTION ROUTES
   app.get(app.basepath, tagsRoutes.getCollection); // RETRIEVE APIS FOR A GIVEN TAG
   app.get(app.basepath + 'tags/:tag', tagsRoutes.getCollection); // RETRIEVE APIS FOR A GIVEN TAG
+  app.get(app.basepath + 'tags', tagsRoutes.getTags); // REDIRECTS TO ROOT
   app.get(app.basepath + ':id/tags', tagsRoutes.getTagsForOneApi); // RETRIEVE TAGS COLLECTION FOR INDIVIDUAL API
   
   // CATCH EVERYTHING ELSE AND RETURN A 400 BAD INPUT
