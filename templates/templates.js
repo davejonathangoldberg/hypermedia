@@ -2,17 +2,21 @@ module.exports = function Templates() {
   
   // PRIVATE FUNCTIONS  
   this.constructLinkObject = function(linkArray, href, rel, prompt, limit, offset){
-    href = href || '';
-    rel = rel || '';
-    prompt = prompt || rel;
-    limit = limit || 'na';
-    offset = offset || 'na';
+    href = typeof href !== 'undefined' ? href : '';
+    rel = typeof rel !== 'undefined' ? rel : '';
+    prompt = typeof prompt !== 'undefined' ? prompt : rel;
+    limit = typeof limit !== 'undefined' ? limit : 'na';
+    offset = typeof offset !== 'undefined' ? offset : 'na';
     var linkObject = {};
     
+    console.log('rel: ' + rel);
     if (rel == 'next') {
+      console.log('rel asserted: ' + rel);
       if (!(limit == 'na' || offset == 'na')){
+        console.log('test asserted: ' + limit + " " + offset);
         var newOffset = (parseInt(limit) + parseInt(offset));
         href = href + '?limit=' + limit + '&offset=' + newOffset;
+        console.log('rel next link href: ' + href);
       }
     }
     if (rel == 'prev') {   
@@ -28,6 +32,8 @@ module.exports = function Templates() {
           return linkArray;
         }
       }
+    console.log('link href: ' + href);
+    console.log('link limit: ' + limit);
     linkArray.push({"href" : href, "rel" : rel, "prompt": prompt }); 
     return linkArray;
   }
