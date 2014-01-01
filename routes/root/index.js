@@ -40,7 +40,7 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
       
-      if ((req.accepts(['html', 'json', app.mediaType]) == 'html')) {
+      if ((req.accepts(['json', app.mediaType, 'text/html']) == 'text/html')) {
         res.set('Content-Type', 'text/html');
         res.statusCode = 200;
         res.render('rootCollection', rootCollectionObject);
@@ -110,7 +110,6 @@ module.exports = function RootRoutes(app, database, templates, validations) {
       
       // INSERT FORMATTED RESULTS INTO FORMATTED WRAPPER FOR PRESENTATION
       var rootCollectionObject = templates.collectionObject(collection, version, href, links, items, queries, template);
-      console.log(JSON.stringify(rootCollectionObject.collection.links));
       if ((req.accepts(['html', 'json', app.mediaType]) == 'html')) {
         res.set('Content-Type', 'text/html');
         res.statusCode = 200;
